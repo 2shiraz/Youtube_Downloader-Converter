@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.3",
     "ffmpeg-static": "^5.0.0",
+    "fluent-ffmpeg": "^2.1.2",
     "ytdl-core": "^4.11.4"
   },
   "devDependencies": {

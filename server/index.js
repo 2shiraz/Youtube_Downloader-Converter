@@ -4,6 +4,8 @@ const cors = require("cors");
 const ytdl = require("ytdl-core");
 const app = express();
 
+const ffmpeg2 = require('fluent-ffmpeg');
+
 const cp = require("child_process");
 const ffmpeg = require("ffmpeg-static");
 const { application } = require("express"); 
@@ -120,12 +122,19 @@ app.post("/convert", async (req, res) => {
   let title = encodeURI(info.videoDetails.title);
   console.log(title);
   console.log(encodeURI(title));
-  res.header(`Content-Disposition`, `attachement; filename="${title}".mp3`);
+  res.header(`Content-Disposition`, `attachment; filename="${title}.mp3"`);
 
-  let audio = await ytdl(url, { filter: "audioonly", highWaterMark: 1 << 25 });
-  audio.pipe(res)
+  let audioStream = ytdl(url, { filter: "audioonly" });
+  let ffmpegProcess = new ffmpeg2(audioStream)
+    .toFormat('mp3')
+    .audioBitrate(320)
+    .on('end', function() {
+      console.log('Finished converting audio');
+    })
+    .on('error', function(err) {
+      console.log('Error while converting audio: ' + err.message);
+    });
 
-
+  ffmpegProcess.pipe(res);
 })
-
 
